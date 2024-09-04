@@ -57,6 +57,9 @@ class TeenieChain:
 
         return new_proof
 
+    @staticmethod
+    def mining(previous_proof: hex) -> int:
+
     def hash(self, block: Block) -> str:
         encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
