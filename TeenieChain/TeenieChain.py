@@ -29,7 +29,7 @@ class TeenieChain:
             self,
             previous_hash: hex,
             proof: int
-    ) -> Block:
+    ) -> None:
         _new_block = Block(
             version="0.1.0",
             previous_hash=previous_hash,
@@ -56,9 +56,6 @@ class TeenieChain:
                 new_proof += 1
 
         return new_proof
-
-    @staticmethod
-    def mining(previous_proof: hex) -> int:
 
     def hash(self, block: Block) -> str:
         encoded_block = json.dumps(block, sort_keys=True).encode()
