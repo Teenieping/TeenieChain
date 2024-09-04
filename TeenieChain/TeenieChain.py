@@ -1,63 +1,62 @@
+import hashlib
+import json
 from datetime import datetime
 from typing import List
 
 from Block import Block
-from transactions.Transaction import Transaction
 
 
 class TeenieChain:
     # Todo chain
-    chain: List[Block] = []
+    chain: List[Block]
 
     def __init__(self):
-        pass
+        self.chain = []
+        self.mint(previous_hash=0x0, proof=0x0)
 
     """
         mint - Create New Block
+        
+        Create Block with mining
+        
+        previous_block = teenieChain.get_previous_block()
+        previous_proof = previous_block["header"]["proof"]
+        proof = teenieChain.proof_of_work(previous_proof=previous_proof)
+        previous_hash = teenieChain.hash(previous_block)
+        teenieChain.mint(proof=proof, previous_hash=previous_hash)
     """
-    @staticmethod
     def mint(
-            previous_hash: str,
-            aim_level: int,
-            nonce: int,
-            sender: str,
-            recipient: str,
-            amount: int
+            self,
+            previous_hash: hex,
+            proof: int
     ) -> Block:
-        """Initialize new Block"""
         _new_block = Block(
             version="0.1.0",
             previous_hash=previous_hash,
-            merkle_root="0",
+            proof=proof,
+            merkle_root="0",    # Todo
             timestamp=datetime.now(),
-            aim_level=aim_level,
-            nonce=nonce,
-            transaction=Transaction(
-                sender=sender,
-                recipient=recipient,
-                amount=amount
-            )
         )
-        return _new_block
+        self.chain.append(Block.serialize(_new_block))
+        del _new_block
 
-    """
-        verify_hash - Verify hash and append at chain
-    """
-    def verify_hash(self, block: Block):
-        # Todo verify hash logic
+    def get_previous_block(self) -> Block:
+        return self.chain[-1]
 
-        self.chain.append(block)
-        return block
+    @staticmethod
+    def proof_of_work(previous_proof: hex) -> int:
+        new_proof = 0x1
+        check_proof = False
 
+        while not check_proof:
+            operation = hashlib.sha256(str(new_proof ** 2 - previous_proof ** 2).encode()).hexdigest()
+            if operation.startswith("0000"):
+                check_proof = True
+            else:
+                new_proof += 1
 
-if __name__ == "__main__":
-    block = TeenieChain.mint(
-        previous_hash="0",
-        aim_level=1,
-        nonce=1,
-        sender="0",
-        recipient="0",
-        amount=100
-    )
-    print(block.Body.transaction)
-    print(TeenieChain.chain)
+        return new_proof
+
+    def hash(self, block: Block) -> str:
+        encoded_block = json.dumps(block, sort_keys=True).encode()
+        return hashlib.sha256(encoded_block).hexdigest()
