@@ -41,6 +41,7 @@ class TeenieChain:
             merkle_root=TeenieChain.MERKEL_ROOT,
             aim_level=self.AIM_LEVEL,
             timestamp=datetime.now(),
+            nonce=proof,
         )
 
         self.chain.append(Block.serialize(_new_block))
