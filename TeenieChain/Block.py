@@ -8,13 +8,12 @@ class Block:
     def __init__(
             self,
             version: str,
-            previous_hash: hex,
+            previous_hash: int,
             proof: int,
-            merkle_root: str,
+            merkle_root: hex,
             timestamp: datetime,
-            aim_level: int = None,
+            aim_level: hex,
             nonce: int = None,
-
             transaction: Transaction = None,
     ):
         self.Header.version = version
@@ -29,11 +28,11 @@ class Block:
 
     class Header:
         version: str
-        previous_hash: hex
+        previous_hash: int
         proof: int
-        merkle_root: str
+        merkle_root: hex
         timestamp: datetime
-        aim_level: int
+        aim_level: hex
         nonce: int
 
     class Body:
