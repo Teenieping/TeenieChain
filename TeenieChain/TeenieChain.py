@@ -19,6 +19,8 @@ class TeenieChain:
     """
         mint - Create New Block
         
+        hashlib.sha256(str(new_proof ** 2 - previous_proof ** 2).encode()).hexdigest()
+        
         Create Block with mining
         
         teenieChain = TeenieChain()
@@ -30,6 +32,7 @@ class TeenieChain:
         if teenieChain.proof_of_work(previous_proof=previous_proof, new_proof=new_proof):
             teenieChain.mint(proof=new_proof, previous_hash=previous_hash)
             print(len(teenieChain.chain), teenieChain.chain[i]["header"], teenieChain.end_TIE_of_limit)
+            
     """
 
     def mint(
@@ -51,9 +54,6 @@ class TeenieChain:
         self.chain.append(Block.serialize(_new_block))
         self.end_TIE_of_limit = len(self.chain)/self.CHAIN_LIMIT * 100  # Update 
         return _new_block
-
-    def get_previous_block(self) -> Block:
-        return self.chain[-1]
 
     @staticmethod
     def mining(previous_proof: hex) -> int:
@@ -79,9 +79,26 @@ class TeenieChain:
         encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
 
+    """
+        TeenieChain TNE20
+    """
+    @staticmethod
+    def name() -> str:
+        return "TeenieChain"
+
     def chain_available(self) -> bool:
         if len(self.chain) >= self.CHAIN_LIMIT:
             return False
-
         return True
 
+    def get_previous_block(self) -> Block:
+        return self.chain[-1]
+
+    def get_previous_proof(self) -> int:
+        return self.chain[-1]["header"]["proof"]
+
+    def get_chain(self) -> list[Block]:
+        return self.chain
+
+    def total_supply(self) -> int:
+        return len(self.chain)
