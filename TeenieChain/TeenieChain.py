@@ -10,7 +10,6 @@ class TeenieChain:
     # Todo chain
     chain: List[Block]
     end_TIE_of_limit: float
-    CHAIN_LIMIT: int = 30000
 
     def __init__(self):
         self.chain = []
@@ -32,7 +31,7 @@ class TeenieChain:
             print(len(teenieChain.chain), teenieChain.chain[i]["header"], teenieChain.end_TIE_of_limit)
     """
 
-    def mint(
+    def create(
             self,
             previous_hash: hex,
             proof: int
@@ -49,7 +48,6 @@ class TeenieChain:
         )
 
         self.chain.append(Block.serialize(_new_block))
-        self.end_TIE_of_limit = len(self.chain)/self.CHAIN_LIMIT * 100  # Update 
         return _new_block
 
     def get_previous_block(self) -> Block:
@@ -78,10 +76,3 @@ class TeenieChain:
     def hash(self, block: Block) -> str:
         encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
-
-    def chain_available(self) -> bool:
-        if len(self.chain) >= self.CHAIN_LIMIT:
-            return False
-
-        return True
-
