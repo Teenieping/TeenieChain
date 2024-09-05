@@ -21,6 +21,8 @@ class TeenieChain:
         
         Create Block with mining
         
+        teenieChain = TeenieChain()
+        
         previous_block = teenieChain.get_previous_block()
         previous_proof = previous_block["header"]["proof"]
         new_proof = teenieChain.mining(previous_proof=previous_proof)
