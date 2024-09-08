@@ -11,6 +11,8 @@ class TeenieChain:
     chain: List[Block]
     end_TIE_of_limit: float
     CHAIN_LIMIT: int = 30000
+    AIM_LEVEL: hex  = 0x00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    MERKEL_ROOT     = 000000000000000000000000000000000000000000000000000000000000000000
 
     def __init__(self):
         self.chain = []
@@ -19,23 +21,15 @@ class TeenieChain:
     """
         mint - Create New Block
         
+        hashlib.sha256(str(new_proof ** 2 - previous_proof ** 2).encode()).hexdigest()
+        
         Create Block with mining
-        
-        teenieChain = TeenieChain()
-        
-        previous_block = teenieChain.get_previous_block()
-        previous_proof = previous_block["header"]["proof"]
-        new_proof = teenieChain.mining(previous_proof=previous_proof)
-        previous_hash = teenieChain.hash(previous_block)
-        if teenieChain.proof_of_work(previous_proof=previous_proof, new_proof=new_proof):
-            teenieChain.mint(proof=new_proof, previous_hash=previous_hash)
-            print(len(teenieChain.chain), teenieChain.chain[i]["header"], teenieChain.end_TIE_of_limit)
     """
 
     def mint(
             self,
-            previous_hash: hex,
-            proof: int
+            previous_hash: int,
+            proof: int,
     ) -> Block | str:
         if self.chain_available() is False:
             return "Chain Limit!"
@@ -44,44 +38,79 @@ class TeenieChain:
             version="0.1.0",
             previous_hash=previous_hash,
             proof=proof,
-            merkle_root="0",  # Todo
+            merkle_root=TeenieChain.MERKEL_ROOT,
+            aim_level=self.AIM_LEVEL,
             timestamp=datetime.now(),
+            nonce=proof,
         )
 
         self.chain.append(Block.serialize(_new_block))
         self.end_TIE_of_limit = len(self.chain)/self.CHAIN_LIMIT * 100  # Update 
         return _new_block
 
-    def get_previous_block(self) -> Block:
-        return self.chain[-1]
-
-    @staticmethod
-    def mining(previous_proof: hex) -> int:
+    def mining(self, previous_proof: int) -> int:
         new_proof = 0x1
         check_proof = False
 
         while not check_proof:
             operation = hashlib.sha256(str(new_proof ** 2 - previous_proof ** 2).encode()).hexdigest()
-            if operation.startswith("00000"):
+            print(operation)
+            if int(operation, 16) < self.AIM_LEVEL:
                 check_proof = True
             else:
                 new_proof += 1
         return new_proof
 
-    @staticmethod
-    def proof_of_work(previous_proof, new_proof) -> bool:
+    def proof_of_work(self, previous_proof, new_proof) -> bool:
         operation = hashlib.sha256(str(new_proof ** 2 - previous_proof ** 2).encode()).hexdigest()
-        if operation.startswith("0000"):
-            return new_proof
-        return False
+        return int(operation, 16) < self.AIM_LEVEL
 
     def hash(self, block: Block) -> str:
         encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
 
+    """
+        TeenieChain TNE20
+    """ 
+    @staticmethod
+    def name() -> str:
+        return "TeenieChain"
+
     def chain_available(self) -> bool:
         if len(self.chain) >= self.CHAIN_LIMIT:
             return False
-
         return True
 
+    def get_previous_block(self) -> Block:
+        return self.chain[-1]
+
+    def get_previous_proof(self) -> int:
+        return self.chain[-1]["header"]["proof"]
+
+    def get_chain(self) -> list[Block]:
+        return self.chain
+
+    def total_supply(self) -> int:
+        return len(self.chain)
+
+
+"""
+import time
+
+if __name__ == "__main__":
+    teenieChain = TeenieChain()
+
+    start_time = time.time()  # Record the start time
+
+    for i in range(1):
+        previous_proof = teenieChain.get_previous_proof()
+        new_proof = teenieChain.mining(previous_proof=previous_proof)
+        previous_hash = teenieChain.hash(teenieChain.get_previous_block())
+        if teenieChain.proof_of_work(previous_proof=previous_proof, new_proof=new_proof):
+            teenieChain.mint(proof=new_proof, previous_hash=previous_hash)
+            print(len(teenieChain.chain), teenieChain.chain[i]["header"], teenieChain.end_TIE_of_limit)
+
+    end_time = time.time()  # Record the end time
+
+    print(f"Execution time: {end_time - start_time:.4f} seconds")
+"""
