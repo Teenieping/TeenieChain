@@ -3,8 +3,7 @@ import json
 from datetime import datetime
 from typing import List
 
-from Block import Block
-
+from TeenieChain.Block import Block
 
 class TeenieChain:
     # Todo chain
@@ -64,7 +63,7 @@ class TeenieChain:
         operation = hashlib.sha256(str(new_proof ** 2 - previous_proof ** 2).encode()).hexdigest()
         return int(operation, 16) < self.AIM_LEVEL
 
-    def hash(self, block: Block) -> str:
+    def hash(self, block: str) -> str:
         encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
 

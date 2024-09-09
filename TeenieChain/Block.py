@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from transactions.Transaction import Transaction
+from TeenieChain.transactions import Transaction
 
 
 class Block:
